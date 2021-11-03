@@ -184,7 +184,19 @@ class KoGPT2Chat(LightningModule):
         return torch.LongTensor(data), torch.LongTensor(mask), torch.LongTensor(label)
 
     def train_dataloader(self):
-        data = pd.read_csv('Chatbot_data/ChatbotData.csv')
+        all_data = pd.DataFrame()
+        for f in glob.glob('/content/drive/MyDrive/*_train.csv'):
+            print(f)
+            df = pd.read_csv(f, encoding='utf-8')
+            df = df[['발화자', '발화문', '인텐트','상담번호']]
+            pv_df = df.pivot_table(index=['상담번호'], columns='발화자',values=['발화문','인텐트'],aggfunc='first')
+            pv_df.dropna(axis=0, inplace=True)
+            all_data = all_data.append(pv_df, ignore_index=True)
+        data = all_data['발화문']
+        intent = all_data['인텐트']['c']
+        data['intent'] = intent
+        data.columns=['custom','system','intent']
+        
         self.train_set = CharDataset(data, max_len=self.hparams.max_len)
         train_dataloader = DataLoader(
             self.train_set, batch_size=self.hparams.batch_size, num_workers=2,
