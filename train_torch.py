@@ -73,8 +73,8 @@ class CharDataset(Dataset):
 
     def __getitem__(self, idx):
         turn = self._data.iloc[idx]
-        q = turn['Q']
-        a = turn['A']
+        q = turn['custom']
+        a = turn['system']
         sentiment = str(turn['label'])
         q_toked = self.tokenizer.tokenize(self.q_token + q + \
                                           self.sent_token + sentiment)   
