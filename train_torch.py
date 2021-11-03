@@ -14,7 +14,7 @@ from transformers import PreTrainedTokenizerFast, GPT2LMHeadModel
 
 import sys
 import glob
-import sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import LabelEncoder
 
 parser = argparse.ArgumentParser(description='Simsimi based on KoGPT-2')
 
