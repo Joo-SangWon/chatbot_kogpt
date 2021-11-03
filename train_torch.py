@@ -12,6 +12,10 @@ from torch.utils.data import DataLoader, Dataset
 from transformers.optimization import AdamW, get_cosine_schedule_with_warmup
 from transformers import PreTrainedTokenizerFast, GPT2LMHeadModel
 
+import sys
+import glob
+import sklearn.preprocessing import LabelEncoder
+
 parser = argparse.ArgumentParser(description='Simsimi based on KoGPT-2')
 
 parser.add_argument('--chat',
@@ -185,6 +189,7 @@ class KoGPT2Chat(LightningModule):
 
     def train_dataloader(self):
         all_data = pd.DataFrame()
+        le = LabelEncoder()
         for f in glob.glob('/content/drive/MyDrive/*_train.csv'):
             print(f)
             df = pd.read_csv(f, encoding='utf-8')
@@ -194,8 +199,10 @@ class KoGPT2Chat(LightningModule):
             all_data = all_data.append(pv_df, ignore_index=True)
         data = all_data['발화문']
         intent = all_data['인텐트']['c']
-        data['intent'] = intent
-        data.columns=['custom','system','intent']
+        data['label'] = intent
+        data.columns=['custom','system','label']
+        data_2 = le.fit_transform(data['label'])
+        data['iabel']=data_2
         
         self.train_set = CharDataset(data, max_len=self.hparams.max_len)
         train_dataloader = DataLoader(
