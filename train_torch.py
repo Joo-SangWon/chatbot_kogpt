@@ -203,6 +203,7 @@ class KoGPT2Chat(LightningModule):
         data.columns=['custom','system','label']
         data_2 = le.fit_transform(data['label'])
         data['iabel']=data_2
+        print('data setting finished')
         
         self.train_set = CharDataset(data, max_len=self.hparams.max_len)
         train_dataloader = DataLoader(
